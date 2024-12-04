@@ -12,3 +12,138 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                     String                   @id @default(cuid()) // Unique identifier for the user
+  firstName              String
+  middleName             String
+  lastName               String // Optional last name for display purposes
+  username               String                   @unique // Unique username for display and tagging
+  email                  String                   @unique // Email address
+  emailVerificationToken EmailVerificationToken[]
+  oAuthToken             OAuthToken[]
+  hashedPassword         String // Hashed password for authentication
+  profilePictureUrl      String? // Optional profile picture URL
+  bio                    String? // Optional user bio
+  location               String? // User's general location (e.g., city or region)
+
+  // Engagement & Community
+  totalLikes   Int   @default(0) // Aggregate likes from posts or events
+  achievements Json? // JSON object to store unlocked badges/trophies/titles
+
+  // Social Features
+  followers Int @default(0) // Count of followers
+  following Int @default(0) // Count of following
+
+  // Account State
+  isVerified     Boolean   @default(false) // Email/identity verification status
+  authProvider   String? // Tracks the OAuth provider, e.g., "google", "apple"
+  authProviderId String?   @unique // The unique ID from the OAuth provider (e.g., Google user ID)
+  createdAt      DateTime  @default(now()) // Account creation timestamp
+  updatedAt      DateTime  @updatedAt // Auto-updating timestamp for changes
+  lastLogin      DateTime? // Last login timestamp
+
+  // Relationships
+  posts      Post[] // Relationship to the Post model (user-generated posts)
+  clips      Clip[] // Relationship to the Clips model (user-generated clips)
+  // Optional Authentication Fields
+  Collection Collection[]
+  Comment    Comment[]
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid()) // Unique identifier for the token
+  userId    String // Foreign key linking to the User who owns this token
+  user      User     @relation(fields: [userId], references: [id]) // Relationship to User
+  token     String   @unique // The unique verification token (store as plain text or hashed)
+  createdAt DateTime @default(now()) // Timestamp for when the token was created
+  expiresAt DateTime // When the token will expire
+}
+
+model OAuthToken {
+  id           String    @id @default(cuid())
+  userId       String // Foreign key to User
+  user         User      @relation(fields: [userId], references: [id])
+  provider     String // OAuth provider, e.g., "google", "apple"
+  accessToken  String // Short-lived access token
+  refreshToken String? // Optional: Refresh token for renewing the access token
+  expiresAt    DateTime? // Expiry time for the access token
+
+  createdAt DateTime @default(now())
+}
+
+model Clip {
+  id             String           @id @default(cuid())
+  userId         String // Foreign key to User
+  user           User             @relation(fields: [userId], references: [id])
+  title          String?
+  videoUrl       String // Path to the uploaded video (e.g., S3 bucket)
+  views          Int              @default(0)
+  likes          Int              @default(0)
+  comments       Comment[] // Relationship to the comments model (user-generated comments)
+  saves          Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  CollectionClip CollectionClip[]
+}
+
+model Post {
+  id             String           @id @default(cuid()) // Unique identifier for the post
+  userId         String // Foreign key to the User who created the post
+  user           User             @relation(fields: [userId], references: [id])
+  title          String // Title or headline for the post
+  content        String? // Optional text content for the post
+  mediaUrl       String? // Optional media URL (e.g., image or video related to the post)
+  tags           String[] // Array of tags for categorization and discovery
+  likes          Int              @default(0) // Total number of likes the post has received
+  createdAt      DateTime         @default(now()) // Timestamp for when the post was created
+  updatedAt      DateTime         @updatedAt // Auto-updating timestamp for changes
+  Comment        Comment[]
+  CollectionPost CollectionPost[]
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  public      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships via pivot tables
+  posts CollectionPost[]
+  clips CollectionClip[]
+}
+
+model CollectionPost {
+  id           String     @id @default(cuid()) // Unique identifier
+  collectionId String // Foreign key to the Collection
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  postId       String // Foreign key to the Post
+  post         Post       @relation(fields: [postId], references: [id])
+  createdAt    DateTime   @default(now()) // Timestamp for when the item was added
+}
+
+model CollectionClip {
+  id           String     @id @default(cuid()) // Unique identifier
+  collectionId String // Foreign key to the Collection
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  clipId       String // Foreign key to the Clip
+  clip         Clip       @relation(fields: [clipId], references: [id])
+  createdAt    DateTime   @default(now()) // Timestamp for when the item was added
+}
+
+model Comment {
+  id        String   @id @default(cuid()) // Unique identifier for the comment
+  postId    String // Foreign key to the Post being commented on
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String // Foreign key to the User who made the comment
+  user      User     @relation(fields: [userId], references: [id])
+  content   String // The actual comment text
+  createdAt DateTime @default(now()) // Timestamp for when the comment was created
+  updatedAt DateTime @updatedAt // Auto-updating timestamp for changes
+  clip      Clip?    @relation(fields: [clipId], references: [id])
+  clipId    String?
+}
