@@ -13,14 +13,6 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<any> {
     // Include signup method from auth.service
-    const hashedPassword = await this.authService.signup(signupDto)
-    console.log('hashedPassword', hashedPassword)
-    return (
-      { 
-        email: signupDto.email, 
-        password: hashedPassword, 
-        message: 'Signup successful' 
-      } as any
-    );
+    return await this.authService.signup(signupDto)
   }
 }

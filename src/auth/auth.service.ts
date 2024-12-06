@@ -7,11 +7,18 @@ type SignupDto = {
   password: string;
 }
 
+type PendingUser = {
+  email: string;
+  password: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async signup(signupDto: SignupDto): Promise<void> {
+  async signup(signupDto: SignupDto): Promise<PendingUser> {
       const { email, password } = signupDto;
 
       const userExists = await this.prismaService.user.findUnique({ where: { email }})
@@ -26,9 +33,9 @@ export class AuthService {
       const expiresAt = new Date
       expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
-      await this.prismaService.pendingUser.create({
+      return await this.prismaService.pendingUser.create({
         data: {
-          email,
+          email: email,
           password: hashedPassword,
           expiresAt: expiresAt,
         },
