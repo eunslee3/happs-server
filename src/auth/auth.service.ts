@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcryptjs';
+import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 type SignupDto = {
   email: string;
@@ -19,7 +19,7 @@ export class AuthService {
         throw new Error('Email already in use');
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
+      const hashedPassword = await bcrypt.hash(password, 10)
+      return hashedPassword
   }
 }
