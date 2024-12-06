@@ -19,7 +19,19 @@ export class AuthService {
         throw new Error('Email already in use');
       }
 
+      // Hash the password and store in pending users list
       const hashedPassword = await bcrypt.hash(password, 10)
-      return hashedPassword
+
+      // Set the expiration time for the pending user
+      const expiresAt = new Date
+      expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+      await this.prismaService.pendingUser.create({
+        data: {
+          email,
+          password: hashedPassword,
+          expiresAt: expiresAt,
+        },
+      })
   }
 }
