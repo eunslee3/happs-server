@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { handleSendVerificationToken } from 'src/utility/handleSendVerificationToken';
+import * as crypto from 'crypto';
 
 type SignupDto = {
   email: string;
@@ -15,6 +17,7 @@ type sendVerificationTokenDto = {
 type PendingUser = {
   email: string;
   password: string;
+  verificationToken?: number;
   createdAt: Date;
   expiresAt: Date;
 }
@@ -44,6 +47,7 @@ export class AuthService {
       data: {
         email: email,
         password: hashedPassword,
+        verificationToken: null,
         expiresAt: expiresAt,
       },
     })
@@ -51,11 +55,20 @@ export class AuthService {
 
   async sendVerificationToken(sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
     const { email, phoneNumber } = sendVerificationTokenDto;
-    
-    if (phoneNumber) {
-      // Send SMS verification code
-    } else {
-      // Send email verification code
+
+    try {
+      // Generate random numeric token
+      const randomBytes = crypto.randomBytes(3);
+      const token = parseInt(randomBytes.toString('hex'), 16);
+      await this.prismaService.pendingUser.update({
+        where: { email },
+        data: { verificationToken: token },
+      })
+
+      handleSendVerificationToken(email, phoneNumber, token);
+    } catch (err) {
+      console.error(err)
+      throw new Error('Failed to send verification token');
     }
   }
 }
