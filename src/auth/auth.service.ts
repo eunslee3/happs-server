@@ -38,6 +38,8 @@ export class AuthService {
     const expiresAt = new Date
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
+    // TODO: Handle exceptions
+
     return await this.prismaService.pendingUser.create({
       data: {
         email: email,
@@ -48,7 +50,12 @@ export class AuthService {
   }
 
   async sendVerificationToken(sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
-    const { email, password } = sendVerificationTokenDto;
-    console.log(email, password)
+    const { email, phoneNumber } = sendVerificationTokenDto;
+    
+    if (phoneNumber) {
+      // Send SMS verification code
+    } else {
+      // Send email verification code
+    }
   }
 }

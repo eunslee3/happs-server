@@ -24,5 +24,6 @@ export class AuthController {
   @Post('send-verification-token')
   async sendVerificationToken(@Body() sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
     // call service method
+    return await this.authService.sendVerificationToken(sendVerificationTokenDto)
   }
 }
