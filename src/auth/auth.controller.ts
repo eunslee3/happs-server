@@ -6,7 +6,7 @@ type SignupDto = {
   password: string;
 };
 
-type sendVerificationTokenDto = {
+type SendVerificationTokenDto = {
   email?: string;
   phoneNumber?: string;
 };
@@ -22,7 +22,7 @@ export class AuthController {
   }
 
   @Post('send-verification-token')
-  async sendVerificationToken(@Body() sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
+  async sendVerificationToken(@Body() sendVerificationTokenDto: SendVerificationTokenDto): Promise<any> {
     // call service method
     return await this.authService.sendVerificationToken(sendVerificationTokenDto)
   }
