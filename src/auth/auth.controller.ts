@@ -6,6 +6,11 @@ type SignupDto = {
   password: string;
 };
 
+type sendVerificationTokenDto = {
+  email?: string;
+  phoneNumber?: string;
+};
+
 @Controller('auth')
 export class AuthController {
 
@@ -14,5 +19,10 @@ export class AuthController {
   async signup(@Body() signupDto: SignupDto): Promise<any> {
     // Include signup method from auth.service
     return await this.authService.signup(signupDto)
+  }
+
+  @Post('send-verification-token')
+  async sendVerificationToken(@Body() sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
+    // call service method
   }
 }
