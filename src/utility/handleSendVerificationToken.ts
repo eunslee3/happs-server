@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmail = async (to: string, token: number) => {
-  const html = 
+  const html =
   `
   <h1>Email Verification</h1>
   <p>Hello, this is your one-time token: ${token}. This expires in 5 minutes.</p>
@@ -53,9 +53,21 @@ export const handleSendVerificationToken = async (
   phoneNumber: string, 
   token: number
 ) => {
-  if (phoneNumber) {
-    await createMessage(phoneNumber, token);
-  } else {
-    await sendEmail(email, token);
+  try {
+    if (phoneNumber) {
+      await createMessage(phoneNumber, token);
+    } else {
+      await sendEmail(email, token);
+    }
+    return {
+      message: 'Verification token sent successfully',
+      status: 200,
+    }
+  } catch (error) {
+    console.error(error);
+    return({
+      message: 'Failed to send verification token',
+      status: 400,
+    })
   }
 }

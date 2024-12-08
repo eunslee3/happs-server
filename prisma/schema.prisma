@@ -9,10 +9,10 @@ datasource db {
 
 model User {
   id                     String                   @id @default(cuid())
-  firstName              String
-  middleName             String
-  lastName               String
-  username               String                   @unique
+  firstName              String?
+  middleName             String?
+  lastName               String?
+  username               String?                   @unique
   email                  String                   @unique
   hashedPassword         String
   profilePictureUrl      String?
@@ -133,8 +133,14 @@ model Comment {
 model PendingUser {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String
+  hashedPassword  String
   verificationToken  Int?
   createdAt DateTime @default(now())
-  expiresAt DateTime
+  expiresAt DateTime?
+  attempts Int? @default(0) // Tracks the number of input attempts; max: 5 until timeout
+  timeoutForAttempts DateTime? // Put user in a timeout for too many input attempts or too many tokens sent
+  timeoutForToken DateTime?
+  numberOfTimeoutsForAttempts Int? @default(0) // Track the number of timeouts. Increase lockout time for subsequent number of timeouts
+  numberOfTimeoutsForTokens Int? @default(0) // Track the number of timeouts. Increase lockout time for subsequent number of timeouts
+  amountOfVerificationTokensSent Int? @default(0) // Tracks the number of tokens sent to user; max: 3 until timeout
 }

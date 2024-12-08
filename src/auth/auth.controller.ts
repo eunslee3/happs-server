@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 type SignupDto = {
@@ -12,6 +12,11 @@ type SendVerificationTokenDto = {
   phoneNumber?: string;
 };
 
+type VerifyTokenDto = {
+  id: string;
+  tokenInput: number;
+};
+
 @Controller('auth')
 export class AuthController {
 
@@ -22,9 +27,16 @@ export class AuthController {
     return await this.authService.signup(signupDto)
   }
 
-  @Post('send-verification-token')
+  @Post('send-otp')
+  @HttpCode(200)
   async sendVerificationToken(@Body() sendVerificationTokenDto: SendVerificationTokenDto): Promise<any> {
     // call service method
     return await this.authService.sendVerificationToken(sendVerificationTokenDto)
+  }
+
+  @Post('verify-token')
+  async verifyToken(@Body() verifyTokenDto: VerifyTokenDto): Promise<any> {
+    // call service method
+    return await this.authService.verifyToken(verifyTokenDto)
   }
 }
