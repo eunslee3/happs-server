@@ -7,13 +7,12 @@ const client = twilio(accountSid, authToken);
 
 // SMS authentication
 const createMessage = async (phoneNumber: string, token: number) => {
-  const message = await client.messages.create({
+  await client.messages.create({
     body: `This is your one-time token: ${token}. This expires in 5 minutes.`,
-    from: "+15017122661",
-    to: `${phoneNumber}`,
+    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
+    to: phoneNumber,
   });
-
-  console.log(message.body)
+  console.log('SMS Sent')
 }
 
 // Email authentication

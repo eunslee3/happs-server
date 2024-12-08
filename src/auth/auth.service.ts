@@ -10,6 +10,7 @@ type SignupDto = {
 }
 
 type sendVerificationTokenDto = {
+  id: string;
   email?: string;
   phoneNumber?: string;
 };
@@ -54,14 +55,14 @@ export class AuthService {
   }
 
   async sendVerificationToken(sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
-    const { email, phoneNumber } = sendVerificationTokenDto;
+    const { id, email, phoneNumber } = sendVerificationTokenDto;
 
     try {
       // Generate random numeric token
       const randomBytes = crypto.randomBytes(3);
       const token = parseInt(randomBytes.toString('hex'), 16);
       await this.prismaService.pendingUser.update({
-        where: { email },
+        where: { id: id },
         data: { verificationToken: token },
       })
 

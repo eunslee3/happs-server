@@ -7,6 +7,7 @@ type SignupDto = {
 };
 
 type SendVerificationTokenDto = {
+  id: string;
   email?: string;
   phoneNumber?: string;
 };
