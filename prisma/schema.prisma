@@ -133,7 +133,8 @@ model Comment {
 
 model PendingUser {
   id        String   @id @default(uuid())
-  email     String   @unique
+  email     String?   @unique
+  phoneNumber String? @unique
   hashedPassword  String
   verificationToken  Int?
   createdAt DateTime @default(now())

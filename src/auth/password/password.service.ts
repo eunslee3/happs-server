@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { LoginDto } from '../dto/dto';
 
 @Injectable()
 export class PasswordService {
@@ -15,11 +16,11 @@ export class PasswordService {
     }
   }
 
-  async decrpytHash(email: string, password: string): Promise<any> {
+  async decrpytHash(loginDto: LoginDto): Promise<any> {
+    const { email, password } = loginDto;
     try {
       const user = await this.prismaService.user.findUnique({
-        where: { email },
-        select: { hashedPassword: true },
+        where: { email }
       })
       const { hashedPassword, ...userWithoutPassword } = user;
       const isAuthenticated = await bcrypt.compare(password, hashedPassword);

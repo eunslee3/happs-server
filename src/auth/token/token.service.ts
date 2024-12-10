@@ -147,7 +147,7 @@ export class TokenService {
     } 
     else {
       // Create the bare minimum user. We will update this with further registration information
-      await this.prismaService.user.create({
+      const createdUser = await this.prismaService.user.create({
         data: {
           email: email,
           hashedPassword: hashedPassword,
@@ -157,7 +157,7 @@ export class TokenService {
       return ({
         status: 201,
         message: "User registered successfully",
-        data: { email: email, isVerified: true }
+        data: { createdUser }
       });
     }
   }

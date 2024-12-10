@@ -1,14 +1,16 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TokenService } from './token/token.service';
-import { SignupDto, SendVerificationTokenDto, VerifyTokenDto } from './dto/dto';
+import { PasswordService } from './password/password.service';
+import { SignupDto, SendVerificationTokenDto, VerifyTokenDto, LoginDto } from './dto/dto';
 
 @Controller('auth')
 export class AuthController {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly passwordService: PasswordService
   ) {}
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<any> {
@@ -27,5 +29,10 @@ export class AuthController {
   async verifyToken(@Body() verifyTokenDto: VerifyTokenDto): Promise<any> {
     // call service method
     return await this.tokenService.verifyToken(verifyTokenDto)
+  }
+
+  @Post('authenticate-user')
+  async authenticateUser(@Body() loginDto: LoginDto): Promise<any> {
+    return await this.authService.login(loginDto)
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PasswordService } from './password/password.service';
-import * as bcrypt from 'bcrypt';
 import { SignupDto, PendingUser, LoginDto } from './dto/dto';
 
 @Injectable()
@@ -44,9 +43,8 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<any> {
-    const { email, password } = loginDto;
     try {
-      const user = await this.passwordService.decrpytHash(email, password);
+      const user = await this.passwordService.decrpytHash(loginDto);
       return user
     } catch (err) {
       console.error(`Error: ${err}`);
