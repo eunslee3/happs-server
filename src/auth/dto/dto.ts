@@ -14,6 +14,11 @@ export type SignupDto = {
   password: string;
 }
 
+export type LoginDto = {
+  email: string;
+  password: string;
+};
+
 export type PendingUser = {
   email: string;
   hashedPassword: string;

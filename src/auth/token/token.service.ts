@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { VerifyTokenDto, sendVerificationTokenDto } from '../dto/dto';
+import { VerifyTokenDto, SendVerificationTokenDto } from '../dto/dto';
 import { handleSendVerificationToken } from 'src/utility/handleSendVerificationToken';
 import * as crypto from 'crypto';
 
@@ -16,7 +16,7 @@ const minutesForTimeout = {
 export class TokenService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async sendVerificationToken(sendVerificationTokenDto: sendVerificationTokenDto): Promise<any> {
+  async sendVerificationToken(sendVerificationTokenDto: SendVerificationTokenDto): Promise<any> {
     const { id, email, phoneNumber } = sendVerificationTokenDto;
     const pendingUser = await this.prismaService.pendingUser.findUnique({ where: { id } });
     const currentTime = new Date();
