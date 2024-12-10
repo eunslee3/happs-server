@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { UsersController } from './users/users.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
     UsersModule, 
     PrismaModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, UsersController],
   providers: [AppService],
 })
 export class AppModule {}

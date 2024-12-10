@@ -1,26 +1,15 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-
-type SignupDto = {
-  email: string;
-  password: string;
-};
-
-type SendVerificationTokenDto = {
-  id: string;
-  email?: string;
-  phoneNumber?: string;
-};
-
-type VerifyTokenDto = {
-  id: string;
-  tokenInput: number;
-};
+import { TokenService } from './token/token.service';
+import { SignupDto, SendVerificationTokenDto, VerifyTokenDto } from './dto/dto';
 
 @Controller('auth')
 export class AuthController {
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService
+  ) {}
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<any> {
     // Include signup method from auth.service
@@ -31,12 +20,12 @@ export class AuthController {
   @HttpCode(200)
   async sendVerificationToken(@Body() sendVerificationTokenDto: SendVerificationTokenDto): Promise<any> {
     // call service method
-    return await this.authService.sendVerificationToken(sendVerificationTokenDto)
+    return await this.tokenService.sendVerificationToken(sendVerificationTokenDto)
   }
 
   @Post('verify-token')
   async verifyToken(@Body() verifyTokenDto: VerifyTokenDto): Promise<any> {
     // call service method
-    return await this.authService.verifyToken(verifyTokenDto)
+    return await this.tokenService.verifyToken(verifyTokenDto)
   }
 }

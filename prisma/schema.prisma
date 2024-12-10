@@ -13,7 +13,8 @@ model User {
   middleName             String?
   lastName               String?
   username               String?                   @unique
-  email                  String                   @unique
+  email                  String?                   @unique
+  phoneNumber            String?                   @unique
   hashedPassword         String
   profilePictureUrl      String?
   bio                    String?
