@@ -1,18 +1,20 @@
-import { Controller, Post, Body, HttpCode, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TokenService } from './token/token.service';
 import { PasswordService } from './password/password.service';
 import { SignupDto, SendVerificationTokenDto, VerifyOtpDto, LoginDto } from './dto/dto';
 import { UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-
+import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
-    private readonly passwordService: PasswordService
+    private readonly passwordService: PasswordService,
+    private readonly prismaService: PrismaService,
   ) {}
   @Get('google')
   @UseGuards(AuthGuard('google'))
@@ -22,18 +24,26 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  async googleRedirect(@Req() req) {
+  async googleRedirect(@Req() req, @Res() res) {
     // The user object is attached to req.user by GoogleStrategy
     const user = req.user;
 
     // Generate tokens
     const accessToken = this.tokenService.generateAccessToken({ userId: user.id });
     const refreshToken = this.tokenService.generateRefreshToken({ userId: user.id });
-
-    return {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.prismaService.user.update({
+      where: { email: user.email },
+      data: {
+        refreshToken: hashedRefreshToken
+      }
+    })
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    return res.json({
       message: 'Google login successful',
-      user: req.user,
-    };
+      user,
+      accessToken,
+    });
   }
 
   @Post('signup')
