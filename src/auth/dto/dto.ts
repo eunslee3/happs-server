@@ -1,4 +1,4 @@
-export type VerifyTokenDto = {
+export type VerifyOtpDto = {
   id: string;
   tokenInput: number;
 };

@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { UsersController } from './users/users.controller';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -14,7 +14,11 @@ import { UsersController } from './users/users.controller';
     }),
     AuthModule, 
     UsersModule, 
-    PrismaModule
+    PrismaModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env'
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

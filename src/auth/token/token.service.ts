@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { VerifyTokenDto, SendVerificationTokenDto } from '../dto/dto';
+import { VerifyOtpDto, SendVerificationTokenDto } from '../dto/dto';
 import { handleSendVerificationToken } from 'src/utility/handleSendVerificationToken';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 
 const minutesForTimeout = {
@@ -14,7 +16,28 @@ const minutesForTimeout = {
 
 @Injectable()
 export class TokenService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  generateAccessToken(userId: string) {
+    return this.jwtService.sign({ userId });
+  }
+
+  generateRefreshToken(userId: string) {
+    const refreshSecret = this.configService.get<string>('REFRESH_TOKEN_SECRET');
+    return this.jwtService.sign(
+      { userId },
+      { secret: refreshSecret, expiresIn: '7d' },
+    );
+  }
+
+  validateRefreshToken(token: string) {
+    const refreshSecret = this.configService.get<string>('REFRESH_TOKEN_SECRET');
+    return this.jwtService.verify(token, { secret: refreshSecret });
+  }
 
   async sendVerificationToken(sendVerificationTokenDto: SendVerificationTokenDto): Promise<any> {
     const { id, email, phoneNumber } = sendVerificationTokenDto;
@@ -82,8 +105,8 @@ export class TokenService {
     }
   }
 
-  async verifyToken(verifyTokenDto: VerifyTokenDto): Promise<any> {
-    const { id, tokenInput } = verifyTokenDto;
+  async verifyToken(verifyOtpDto: VerifyOtpDto): Promise<any> {
+    const { id, tokenInput } = verifyOtpDto;
     const currentDate = new Date();
     const expiryDate = new Date();
     const pendingUser = await this.prismaService.pendingUser.findUnique({ where: { id } });

@@ -22,11 +22,11 @@ export class UsersService {
           ...updateUserInfoDto
         }
       });
-      const { hashedPassword, ...user } = updatedUser;
+      delete updatedUser.hashedPassword;
       return {
         status: 200,
         message: 'User info updated successfully',
-        data: user
+        data: updatedUser
       };
     } catch (err) {
       console.error('Failed to update user info', err);
