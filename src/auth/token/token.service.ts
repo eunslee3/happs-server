@@ -22,11 +22,11 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateAccessToken(userId: string) {
+  generateAccessToken(userId: any) {
     return this.jwtService.sign({ userId });
   }
 
-  generateRefreshToken(userId: string) {
+  generateRefreshToken(userId: any) {
     const refreshSecret = this.configService.get<string>('REFRESH_TOKEN_SECRET');
     return this.jwtService.sign(
       { userId },

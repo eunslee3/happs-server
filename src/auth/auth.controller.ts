@@ -1,18 +1,41 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TokenService } from './token/token.service';
 import { PasswordService } from './password/password.service';
 import { SignupDto, SendVerificationTokenDto, VerifyOtpDto, LoginDto } from './dto/dto';
 import { UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('auth')
 export class AuthController {
-
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
     private readonly passwordService: PasswordService
   ) {}
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin() {
+    // This route will automatically redirect the user to Google
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleRedirect(@Req() req) {
+    // The user object is attached to req.user by GoogleStrategy
+    const user = req.user;
+
+    // Generate tokens
+    const accessToken = this.tokenService.generateAccessToken({ userId: user.id });
+    const refreshToken = this.tokenService.generateRefreshToken({ userId: user.id });
+
+    return {
+      message: 'Google login successful',
+      user: req.user,
+    };
+  }
+
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<any> {
     return await this.authService.signup(signupDto)

@@ -7,10 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PasswordService } from './password/password.service';
 import { RegistrationService } from './registration/registration.service';
+import { GoogleStrategy } from './google/google.strategy';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, TokenService, PasswordService, RegistrationService],
+  providers: [AuthService, UsersService, TokenService, PasswordService, RegistrationService, GoogleStrategy],
   imports: [
     PrismaModule,
     ConfigModule.forRoot(), // Load environment variables

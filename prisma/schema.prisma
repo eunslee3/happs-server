@@ -15,7 +15,7 @@ model User {
   username               String?                   @unique
   email                  String?                   @unique
   phoneNumber            String?                   @unique
-  hashedPassword         String
+  hashedPassword         String?
   profilePictureUrl      String?
   bio                    String?
   location               String?
@@ -30,6 +30,7 @@ model User {
   updatedAt              DateTime                 @updatedAt
   lastLogin              DateTime?
   refreshToken           String?
+  googleId               String?                  @unique
   clips                  Clip[]
   Collection             Collection[]
   Comment                Comment[]
