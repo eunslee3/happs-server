@@ -1,4 +1,4 @@
-import { Controller, Body, Query, Post, Get } from '@nestjs/common';
+import { Controller, Body, Query, Post, Get, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/dto';
 
@@ -14,5 +14,10 @@ export class PostsController {
   @Get()
   async getPosts(@Query() query: any) {
     return this.postsService.getAllPosts(query);
+  }
+
+  @Post('/like/:postId')
+  async likePost(@Param('postId') postId: string, @Body() body) {
+    return this.postsService.likePost(body.userId, postId);
   }
 }

@@ -37,6 +37,7 @@ model User {
   emailVerificationToken EmailVerificationToken[]
   oAuthToken             OAuthToken[]
   posts                  Post[]
+  like                   Like[]
 }
 
 model EmailVerificationToken {
@@ -88,6 +89,7 @@ model Post {
   CollectionPost CollectionPost[]
   Comment        Comment[]
   user           User             @relation(fields: [userId], references: [id])
+  like           Like[]
 }
 
 model Collection {
@@ -148,4 +150,15 @@ model PendingUser {
   numberOfTimeoutsForAttempts Int? @default(0) // Track the number of timeouts. Increase lockout time for subsequent number of timeouts
   numberOfTimeoutsForTokens Int? @default(0) // Track the number of timeouts. Increase lockout time for subsequent number of timeouts
   amountOfVerificationTokensSent Int? @default(0) // Tracks the number of tokens sent to user; max: 3 until timeout
+}
+
+model Like {
+  id String @id @default(cuid())
+  userId String
+  postId String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
 }

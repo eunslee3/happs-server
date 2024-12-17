@@ -51,4 +51,49 @@ export class PostsService {
       }
     }
   }
+
+  async likePost(userId: string, postId: string) {
+    try {
+      return await this.prismaService.$transaction(async (prisma) => {
+        const existingLike = await prisma.like.findFirst({
+          where: { userId, postId },
+        });
+  
+        if (existingLike) {
+          await prisma.like.delete({
+            where: { id: existingLike.id },
+          });
+          await prisma.post.update({
+            where: { id: postId },
+            data: { likes: { decrement: 1 } },
+          });
+          return {
+            status: 200,
+            message: 'Post unliked successfully',
+          };
+        }
+  
+        await prisma.like.create({
+          data: { userId, postId },
+        });
+  
+        await prisma.post.update({
+          where: { id: postId },
+          data: { likes: { increment: 1 } },
+        });
+        return {
+          status: 200,
+          message: 'Post liked successfully',
+        };
+      });
+    } catch (err) {
+      console.error('Error in likePost:', err);
+      return {
+        status: 500,
+        message: 'An error occurred while processing the like/unlike action.',
+        error: err.message,
+      };
+    }
+  }
+  
 }
