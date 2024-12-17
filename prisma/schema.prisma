@@ -78,8 +78,9 @@ model Post {
   id             String           @id @default(cuid())
   userId         String
   title          String
-  content        String?
-  mediaUrl       String?
+  description    String?
+  mediaUrl       String           @unique
+  location       String?
   tags           String[]
   likes          Int              @default(0)
   createdAt      DateTime         @default(now())
